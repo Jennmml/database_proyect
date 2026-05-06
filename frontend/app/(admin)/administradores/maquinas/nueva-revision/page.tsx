@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function NuevaRevisionForm() {
   const [cedula, setCedula] = useState("")

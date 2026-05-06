@@ -31,7 +31,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Cliente } from "@/types/cliente"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function ClientesPage() {
   const [searchTerm, setSearchTerm] = useState("")

@@ -25,7 +25,7 @@ export default function DistribucionGeneroChart() {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const res = await fetch("https://api.mytry.dev/sesiones/distribucionGeneroPorEstado")
+        const res = await fetch("http://localhost:3100/sesiones/distribucionGeneroPorEstado")
         const data = await res.json()
         if (data.success && Array.isArray(data.tables[0])) {
           setDatos(data.tables[0])

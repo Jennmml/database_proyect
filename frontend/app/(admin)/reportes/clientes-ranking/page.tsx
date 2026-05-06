@@ -31,7 +31,7 @@ export default function RankingClientesPage() {
   useEffect(() => {
     const fetchRanking = async () => {
       try {
-        const response = await fetch("https://api.mytry.dev/clientes/rankingClientes")
+        const response = await fetch("http://localhost:3100/clientes/rankingClientes")
         const data = await response.json()
         if (data.success && Array.isArray(data.tables) && Array.isArray(data.tables[0])) {
           const ordenados = data.tables[0].sort(

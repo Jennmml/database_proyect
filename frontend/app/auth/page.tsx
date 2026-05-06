@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function AuthPage() {
   const router = useRouter();

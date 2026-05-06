@@ -19,7 +19,7 @@ interface Sesion {
   hora_fin: string
 }
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function InscripcionesPage() {
   const [cedula, setCedula] = useState("")

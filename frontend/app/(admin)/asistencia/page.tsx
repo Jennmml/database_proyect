@@ -18,7 +18,7 @@ import { CheckCircle, XCircle, Search } from "lucide-react"
 import { toast } from "sonner"
 import ClienteSesion from "@/types/clienteSesion"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function AsistenciaPage() {
   const [selectedSesion, setSelectedSesion] = useState("")

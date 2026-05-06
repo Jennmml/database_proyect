@@ -55,7 +55,7 @@ export default function CrearSesionPage() {
   useEffect(() => {
     const fetchSesiones = async () => {
       try {
-        const res = await fetch("https://api.mytry.dev/sesiones/vistaSesiones")
+        const res = await fetch("http://localhost:3100/sesiones/vistaSesiones")
         const data = await res.json()
         if (data.success && Array.isArray(data.tables?.[0])) {
           setSesiones(data.tables[0])
@@ -83,7 +83,7 @@ export default function CrearSesionPage() {
     }
 
     try {
-      const response = await fetch("https://api.mytry.dev/sesiones/crearSesion", {
+      const response = await fetch("http://localhost:3100/sesiones/crearSesion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_sesion: Number(idSesion), fecha })

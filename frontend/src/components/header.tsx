@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { useTheme } from "../../context/ThemeContext";
 
-const api = "https://api.mytry.dev";
+const api = "http://localhost:3100";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();

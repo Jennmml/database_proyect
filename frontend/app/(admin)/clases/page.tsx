@@ -28,7 +28,7 @@ interface Clase {
   total_sesiones: number
 }
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function ClasesPage() {
   const [searchTerm, setSearchTerm] = useState("")

@@ -25,7 +25,7 @@ import {
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function NuevoClientePage() {
   const router = useRouter()

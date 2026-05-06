@@ -15,7 +15,7 @@ import SesionSinEntrenador from "@/types/sesionUnica"
 import EstadisticaEntrenador from "@/types/estadisticaEntrenador"
 import EntrenadoresSesionesTotales from "./sesionesTotales"
 
-const api= "https://api.mytry.dev"
+const api= "http://localhost:3100"
 
 export default function AsignarEntrenadorPage() {
   const [entrenadores, setEntrenadores] = useState<Entrenador[]>([])

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function NuevaClasePage() {
   const [formData, setFormData] = useState({

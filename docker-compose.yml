@@ -1,4 +1,16 @@
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    networks:
+      - app-network
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=FastFitness123!
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
   backend:
     build: ./backend
     ports:
@@ -7,8 +19,8 @@ services:
       - app-network
     environment:
       - NODE_ENV=production
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - sqlserver
 
   frontend:
     build: ./frontend
@@ -24,3 +36,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  sqlserver_data:
