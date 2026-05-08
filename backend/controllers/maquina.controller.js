@@ -56,12 +56,45 @@ export const nuevaRevisionMaquina = async (req, res) => {
             });
         }
 
+        // Validación de formato: id_maquina debe ser entero positivo
+        if (!Number.isInteger(Number(id_maquina)) || Number(id_maquina) <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "id_maquina debe ser un entero positivo.",
+            });
+        }
+
+        // Validación de formato: cédula debe ser exactamente 9 dígitos numéricos
+        if (!/^\d{9}$/.test(String(cedula_admin).trim())) {
+            return res.status(400).json({
+                success: false,
+                message: "cedula_admin debe ser exactamente 9 dígitos numéricos.",
+            });
+        }
+
+        // Validación de formato: nuevo_estado debe ser un entero positivo (TINYINT: 0-255)
+        const estadoNum = Number(nuevo_estado);
+        if (!Number.isInteger(estadoNum) || estadoNum < 0 || estadoNum > 255) {
+            return res.status(400).json({
+                success: false,
+                message: "nuevo_estado debe ser un entero entre 0 y 255.",
+            });
+        }
+
+        // Validación de longitud: observacion máximo 300 caracteres (según esquema BD)
+        if (String(observacion).length > 300) {
+            return res.status(400).json({
+                success: false,
+                message: "observacion no puede exceder 300 caracteres.",
+            });
+        }
+
         await connection
             .request()
-            .input("id_maquina", id_maquina)
-            .input("cedula_admin", cedula_admin)
-            .input("nuevo_estado", nuevo_estado)
-            .input("observacion", observacion)
+            .input("id_maquina", sql.Int, Number(id_maquina))
+            .input("cedula_admin", sql.Char(9), String(cedula_admin).trim())
+            .input("nuevo_estado", sql.TinyInt, estadoNum)
+            .input("observacion", sql.VarChar(300), String(observacion))
             .execute("revisar_maquina");
 
         return res.status(201).json({

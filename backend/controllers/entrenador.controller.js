@@ -1,3 +1,4 @@
+import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
 
 export const asignarEntrenadorASesionProgramada = async (req, res) => {
@@ -12,11 +13,35 @@ export const asignarEntrenadorASesionProgramada = async (req, res) => {
 
     const { cedula_entrenador, id_sesion_programada } = req.body;
 
+    // Validación de campos requeridos
+    if (!cedula_entrenador || !id_sesion_programada) {
+        return res.status(400).json({
+            success: false,
+            message: "Todos los campos son obligatorios (cedula_entrenador, id_sesion_programada).",
+        });
+    }
+
+    // Validación de formato de cédula (exactamente 9 caracteres numéricos)
+    if (!/^\d{9}$/.test(String(cedula_entrenador).trim())) {
+        return res.status(400).json({
+            success: false,
+            message: "La cédula debe ser exactamente 9 dígitos numéricos.",
+        });
+    }
+
+    // Validación de que id_sesion_programada sea un entero positivo
+    if (!Number.isInteger(Number(id_sesion_programada)) || Number(id_sesion_programada) <= 0) {
+        return res.status(400).json({
+            success: false,
+            message: "El id_sesion_programada debe ser un entero positivo.",
+        });
+    }
+
     try {
         const result = await connection
             .request()
-            .input("cedula_entrenador", cedula_entrenador)
-            .input("id_sesion_programada", id_sesion_programada)
+            .input("cedula_entrenador", sql.Char(9), String(cedula_entrenador).trim())
+            .input("id_sesion_programada", sql.Int, Number(id_sesion_programada))
             .execute("asignar_entrenador_a_sesion_programada");
 
         return res.status(200).json({
