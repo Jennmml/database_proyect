@@ -10,6 +10,7 @@ import { Router } from "express";
     rankingClientes,
     clientesMembresiaProximaAVencer
   } from "../controllers/cliente.controller.js";
+import { requireRole } from "../middleware/auth.middleware.js";
 
 const router = Router()
 
@@ -19,9 +20,9 @@ router.get('/vistaClientesSesion', vistaClientesSesion)
 router.get('/rankingClientes', rankingClientes)
 router.get('/clientesMembresiaProximaAVencer', clientesMembresiaProximaAVencer)
 router.get('/vistaHistorialPagosClientes', vistaHistorialPagosClientes)
-router.post('/insertarCliente', insertarCliente)
-router.put('/actualizarPersona', actualizarPersona)
-router.delete('/eliminarPersona', eliminarPersona)
+router.post('/insertarCliente', requireRole('admin'), insertarCliente)
+router.put('/actualizarPersona', requireRole('admin'), actualizarPersona)
+router.delete('/eliminarPersona', requireRole('admin'), eliminarPersona)
 
 
 export default router
