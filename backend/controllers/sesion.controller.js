@@ -100,6 +100,29 @@ export const inscribirClienteASesion = async (req, res) => {
     }
 
     try {
+        // CORRECCIÓN A-06 (CAPEC-178): Verificar membresía activa en el SERVIDOR
+        // antes de inscribir al cliente. No confiar en que el frontend haya validado esto.
+        // Un atacante podría enviar la petición directamente con curl/Postman
+        // sin pasar por la validación del frontend.
+        const membresiaCheck = await connection
+            .request()
+            .input("cedula_check", sql.Char(9), cedula_cliente)
+            .query(`
+                SELECT cm.id_membresia, m.fecha_expiracion, cm.vigente
+                FROM cliente_membresias cm
+                JOIN membresia m ON cm.id_membresia = m.id_membresia
+                WHERE cm.cedula = @cedula_check 
+                  AND cm.vigente = 1 
+                  AND m.fecha_expiracion >= CAST(GETDATE() AS DATE)
+            `);
+
+        if (membresiaCheck.recordset.length === 0) {
+            return res.status(403).json({
+                success: false,
+                message: "El cliente no tiene una membresía activa y vigente. No se puede inscribir a la sesión."
+            });
+        }
+
         await connection
             .request()
             .input("cedula", sql.Char(9), cedula_cliente)
@@ -111,10 +134,10 @@ export const inscribirClienteASesion = async (req, res) => {
             message: "Cliente inscrito a la sesión correctamente"
         });
     } catch (err) {
-        console.error("Error executing iinscribir_cliente_a_sesion_programada procedure: ", err);
+        console.error("Error executing inscribir_cliente_a_sesion_programada procedure: ", err);
         res.status(400).json({
             success: false,
-            message: err.message
+            message: "Error al inscribir al cliente. Verifique los datos ingresados."
         });
     }
 }
