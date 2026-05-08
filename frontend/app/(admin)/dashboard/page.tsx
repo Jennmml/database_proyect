@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 import { datosEstadisticas } from "@/types/estadisticas"
 import { toast } from "sonner"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 
 export default function Dashboard() {

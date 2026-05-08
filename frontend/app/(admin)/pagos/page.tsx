@@ -10,7 +10,7 @@ import { Plus, Search, Filter, DollarSign } from "lucide-react"
 import Link from "next/link"
 import Pago from "@/types/pagos"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function PagosPage() {
   const [searchTerm, setSearchTerm] = useState("")

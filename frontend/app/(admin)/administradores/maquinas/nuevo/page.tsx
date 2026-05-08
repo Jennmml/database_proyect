@@ -14,7 +14,7 @@ interface EstadoMaquina {
     estado: string;
 }
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function NuevaMaquinaPage() {
   const [estados,setEstados] = useState<EstadoMaquina[]>([])

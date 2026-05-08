@@ -19,7 +19,7 @@ export default function EstadoGruposPages() {
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
-        const res = await fetch("https://api.mytry.dev/sesiones/promedioPorGrupoYCupos")
+        const res = await fetch("http://localhost:3100/sesiones/promedioPorGrupoYCupos")
         const json = await res.json()
 
         if (json.success && Array.isArray(json.tables)) {

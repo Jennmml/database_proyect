@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import AdminMaquina from "@/types/adminMaquina"
 import RevisionHistoryModal from "@/components/RevisionHistoryModal"
 
-const api = "https://api.mytry.dev"
+const api = "http://localhost:3100"
 
 export default function AdminMaquinasPage() {
   const [maquinas, setMaquinas] = useState<AdminMaquina[]>([])

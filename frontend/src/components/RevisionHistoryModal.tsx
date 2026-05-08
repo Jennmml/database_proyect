@@ -21,7 +21,7 @@ export default function RevisionHistoryModal({ open, onClose, idMaquina }: Props
     if (!idMaquina) return
 
     const fetchRevisiones = async () => {
-      const res = await fetch("https://api.mytry.dev/admin/vistaRevisionMaquina")
+      const res = await fetch("http://localhost:3100/admin/vistaRevisionMaquina")
       const data = await res.json()
       if (data.success) {
         const filtradas = data.data.filter((r: any) => r.id_maquina === idMaquina)

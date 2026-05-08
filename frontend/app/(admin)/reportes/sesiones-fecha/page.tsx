@@ -14,7 +14,7 @@ export default function ListaSesionesPorMes() {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const res = await fetch("https://api.mytry.dev/sesiones/cantidadSesionPorMes")
+        const res = await fetch("http://localhost:3100/sesiones/cantidadSesionPorMes")
         const data = await res.json()
 
         if (data.success && Array.isArray(data.tables[0])) {

@@ -33,7 +33,7 @@ export default function NuevoPagoPage() {
   useEffect(() => {
     const fetchTipos = async () => {
       try {
-        const response = await fetch("https://api.mytry.dev/consultas/tipoMembresia")
+        const response = await fetch("http://localhost:3100/consultas/tipoMembresia")
         const data = await response.json()
         setTiposMembresia(data.data)
       } catch (err) {
@@ -52,7 +52,7 @@ export default function NuevoPagoPage() {
       return
     }
     try {
-      const response = await fetch(`https://api.mytry.dev/consultas/cliente/${cedula}`)
+      const response = await fetch(`http://localhost:3100/consultas/cliente/${cedula}`)
       const data = await response.json()
       if (data.success) {
         setPersona(data.data)
@@ -83,7 +83,7 @@ export default function NuevoPagoPage() {
         setLoading(false)
         return
       }
-      url = "https://api.mytry.dev/membresias/registrarPagoMembresia"
+      url = "http://localhost:3100/membresias/registrarPagoMembresia"
       body = { cedula_cliente: cedula, tipo_membresia: tipoMembresia, monto, fecha_pago, id_forma_pago: idFormaPago }
     } else if (modo === "actualizar") {
       if (!tipoMembresia) {
@@ -91,11 +91,11 @@ export default function NuevoPagoPage() {
         setLoading(false)
         return
       }
-      url = "https://api.mytry.dev/membresias/actualizarMembresia"
+      url = "http://localhost:3100/membresias/actualizarMembresia"
       method = "PUT"
       body = { cedula_cliente: cedula, tipo_membresia: tipoMembresia, monto, fecha_pago, id_forma_pago: idFormaPago }
     } else if (modo === "renovar") {
-      url = "https://api.mytry.dev/membresias/renovarMembresia"
+      url = "http://localhost:3100/membresias/renovarMembresia"
       method = "PUT"
       body = { cedula: cedula, monto, id_forma_pago: idFormaPago }
     }

@@ -115,10 +115,10 @@ export const getCliente = async (req, res) => {
 
     const { cedula } = req.params;
 
-    if (!cedula || String(cedula).length !== 9) {
+    if (!cedula || !/^\d{9}$/.test(cedula)) {
         return res.status(400).json({
             success: false,
-            message: "Cedula query parameter must be exactly 9 characters",
+            message: "Formato de cédula inválido. Debe contener exactamente 9 dígitos numéricos.",
         });
     }
 
@@ -247,10 +247,10 @@ export const getAdmin = async (req, res) => {
 
     const { cedula } = req.params;
 
-    if (!cedula || String(cedula).length !== 9) {
+    if (!cedula || !/^\d{9}$/.test(cedula)) {
         return res.status(400).json({
             success: false,
-            message: "Cedula query parameter must be exactly 9 characters",
+            message: "Formato de cédula inválido. Debe contener exactamente 9 dígitos numéricos.",
         });
     }
 

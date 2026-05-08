@@ -13,7 +13,7 @@ export default function ProximasAVencerPage() {
   useEffect(() => {
     const fetchMembresias = async () => {
       try {
-        const response = await fetch("https://api.mytry.dev/clientes/clientesMembresiaProximaAVencer")
+        const response = await fetch("http://localhost:3100/clientes/clientesMembresiaProximaAVencer")
         const data = await response.json()
         if (data.success) {
           setMembresias(data.tables[0])

@@ -29,7 +29,7 @@ export default function SesionesPage() {
 
   const fetchSesiones = async () => {
     try {
-      const response = await fetch("https://api.mytry.dev/clientes/vistaClientesSesion")
+      const response = await fetch("http://localhost:3100/clientes/vistaClientesSesion")
       const data = await response.json()
       if (data.success && Array.isArray(data.tables) && Array.isArray(data.tables[0])) {
         setSesiones(data.tables[0])
@@ -59,7 +59,7 @@ export default function SesionesPage() {
 
   const handleVerInscritos = async (id: number, clase: string, grupo: string) => {
     try {
-      const res = await fetch(`https://api.mytry.dev/sesiones/obtenerInscritosPorSesion/${id}`)
+      const res = await fetch(`http://localhost:3100/sesiones/obtenerInscritosPorSesion/${id}`)
       const json = await res.json()
       if (json.success) {
         setTituloSesion(`Clase: ${clase} | Grupo: ${grupo}`)
@@ -80,7 +80,7 @@ export default function SesionesPage() {
 
     try {
       setLoading(true)
-      const res = await fetch("https://api.mytry.dev/sesiones/eliminarSesion", {
+      const res = await fetch("http://localhost:3100/sesiones/eliminarSesion", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
@@ -110,7 +110,7 @@ export default function SesionesPage() {
     if (!confirmar) return
 
     try {
-      const res = await fetch("https://api.mytry.dev/sesiones/desinscribirClienteDeSesion", {
+      const res = await fetch("http://localhost:3100/sesiones/desinscribirClienteDeSesion", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
