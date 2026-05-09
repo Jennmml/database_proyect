@@ -49,7 +49,7 @@ export const nuevaRevisionMaquina = async (req, res) => {
     try {
         const { id_maquina, cedula_admin, nuevo_estado, observacion } = req.body;
 
-        if(!id_maquina || !cedula_admin || !nuevo_estado || !observacion) {
+        if (!id_maquina || !cedula_admin || !nuevo_estado || !observacion) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required.",

@@ -1,9 +1,9 @@
 import request from 'supertest';
 import express from 'express';
-import maquinaRoutes from '../../backend/routes/maquina.routes.js';
+import maquinaRoutes from '../routes/maquina.routes.js';
 
 // Mock del controlador para evitar hacer querys reales a la BD durante la prueba de roles
-jest.mock('../../backend/controllers/maquina.controller.js', () => ({
+jest.mock('../controllers/maquina.controller.js', () => ({
     agregarMaquina: (req, res) => res.status(200).json({ success: true, message: 'Máquina agregada' }),
     nuevaRevisionMaquina: (req, res) => res.status(200).json({ success: true, message: 'Revisión agregada' }),
     cursorMaquinaVencidas: (req, res) => res.status(200).json({ success: true, data: [] })

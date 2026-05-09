@@ -60,9 +60,14 @@ export default function NuevaRevisionForm() {
     }
 
     try {
+      const role = localStorage.getItem("userRole") || "guest";
+
       const res = await fetch(`${api}/maquinas/nuevaRevisionMaquina`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-user-role": role
+        },
         body: JSON.stringify({
           id_maquina: parseInt(idMaquina),
           cedula_admin: cedula,
