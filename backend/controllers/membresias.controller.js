@@ -1,54 +1,8 @@
-import sql from 'mssql';
+import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
+import { registrarPagoSchema } from "../schemas/membresia.schema.js";
 
-/**
- * Constantes de negocio para validación de montos.
- * Estos valores representan los rangos aceptables de pago por tipo de membresía.
- * 
- * CORRECCIÓN A-06 (CAPEC-178): El servidor NO debe confiar en el monto enviado
- * por el cliente. Se valida que el monto sea positivo y se verifica contra
- * la tabla tipo_membresia que el tipo exista antes de procesarlo.
- */
-const MONTO_MINIMO = 1;       // Monto mínimo aceptable en colones
-const MONTO_MAXIMO = 500000;  // Monto máximo razonable para una membresía
-
-/**
- * Valida que el monto sea un número positivo dentro del rango aceptable.
- * DEFENSA contra explotación de la confianza: el cliente podría enviar
- * monto: 0, monto: -500, o monto: 99999999 para manipular pagos.
- */
-const validarMonto = (monto) => {
-    const montoNum = Number(monto);
-    if (isNaN(montoNum) || montoNum < MONTO_MINIMO || montoNum > MONTO_MAXIMO) {
-        return {
-            valid: false,
-            message: `El monto debe ser un número entre ${MONTO_MINIMO} y ${MONTO_MAXIMO} colones.`
-        };
-    }
-    return { valid: true, value: montoNum };
-};
-
-/**
- * Valida que la fecha de pago no sea en el futuro (no se puede pagar en el futuro)
- * ni demasiado antigua (más de 30 días atrás).
- */
-const validarFechaPago = (fecha_pago) => {
-    const fecha = new Date(fecha_pago);
-    if (isNaN(fecha.getTime())) {
-        return { valid: false, message: "Formato de fecha inválido." };
-    }
-    const hoy = new Date();
-    hoy.setHours(23, 59, 59, 999);
-    if (fecha > hoy) {
-        return { valid: false, message: "La fecha de pago no puede ser en el futuro." };
-    }
-    const hace30Dias = new Date();
-    hace30Dias.setDate(hace30Dias.getDate() - 30);
-    if (fecha < hace30Dias) {
-        return { valid: false, message: "La fecha de pago no puede ser mayor a 30 días en el pasado." };
-    }
-    return { valid: true };
-};
+// Funciones de validación auxiliares eliminadas en favor de Zod y validación por BD
 
 export const registrarPagoMembresia = async (req, res) => {
     const { connection } = getConnection();
@@ -56,59 +10,29 @@ export const registrarPagoMembresia = async (req, res) => {
     if (!connection) {
         return res.status(400).json({
             success: false,
-            message: "No active SQL Server connection",
+            message: "No active Sql server connection",
         });
     }
 
-    const {
-        cedula_cliente,
-        tipo_membresia,
-        monto, 
-        fecha_pago,
-        id_forma_pago,
-     } = req.body;
-
-    if (!cedula_cliente || !fecha_pago || !monto || !id_forma_pago) {
+    // VALIDACIÓN ZOD: Asegurar integridad de tipos y formatos
+    const validation = registrarPagoSchema.safeParse(req.body);
+    if (!validation.success) {
         return res.status(400).json({
             success: false,
-            message: "Todos los campos son obligatorios"
+            message: "Datos de pago inválidos",
+            errors: validation.error.errors
         });
     }
 
-    // CORRECCIÓN: Validar monto en el servidor (no confiar en el cliente)
-    const montoValidation = validarMonto(monto);
-    if (!montoValidation.valid) {
-        return res.status(400).json({
-            success: false,
-            message: montoValidation.message
-        });
-    }
-
-    // CORRECCIÓN: Validar fecha de pago en el servidor
-    const fechaValidation = validarFechaPago(fecha_pago);
-    if (!fechaValidation.valid) {
-        return res.status(400).json({
-            success: false,
-            message: fechaValidation.message
-        });
-    }
-
-    // CORRECCIÓN: Validar tipo_membresia es un entero positivo válido
-    const tipoNum = Number(tipo_membresia);
-    if (!Number.isInteger(tipoNum) || tipoNum <= 0) {
-        return res.status(400).json({
-            success: false,
-            message: "El tipo de membresía debe ser un entero positivo."
-        });
-    }
+    const { cedula_cliente, tipo_membresia, monto, fecha_pago, id_forma_pago } = validation.data;
 
     try {
-        // CORRECCIÓN: Verificar que el tipo de membresía existe en la BD
-        // antes de confiar en el dato del cliente
+        // CORRECCIÓN A-06: No confiar en el monto enviado por el cliente.
+        // Consultar el precio real en la base de datos.
         const tipoCheck = await connection
             .request()
-            .input("tipo", sql.TinyInt, tipoNum)
-            .query("SELECT id_tipo_membresia, tipo FROM tipo_membresia WHERE id_tipo_membresia = @tipo");
+            .input("tipo", sql.TinyInt, tipo_membresia)
+            .query("SELECT id_tipo_membresia, precio_base FROM tipo_membresia WHERE id_tipo_membresia = @tipo");
 
         if (tipoCheck.recordset.length === 0) {
             return res.status(400).json({
@@ -117,29 +41,78 @@ export const registrarPagoMembresia = async (req, res) => {
             });
         }
 
+        const precioReal = tipoCheck.recordset[0].precio_base;
+
+        // Comparar monto enviado vs precio base oficial
+        if (Number(monto) !== Number(precioReal)) {
+            console.warn(`Intento de fraude detectado: Cliente ${cedula_cliente} intentó pagar ${monto} por una membresía que cuesta ${precioReal}`);
+            return res.status(400).json({
+                success: false,
+                message: "El monto de pago no coincide con el precio real de la membresía."
+            });
+        }
+
         await connection
             .request()
             .input("cedula_cliente", sql.Char(9), cedula_cliente)
-            .input("tipo_membresia", sql.Int, tipoNum)
-            .input("monto", sql.Decimal(10, 2), montoValidation.value)
+            .input("tipo_membresia", sql.TinyInt, tipo_membresia)
+            .input("monto", sql.Decimal(10, 2), precioReal) // Usamos el precio de la BD
             .input("fecha_pago", sql.Date, fecha_pago)
             .input("id_forma_pago", sql.Int, id_forma_pago)
             .execute("registrar_pago_membresia");
 
         res.status(200).json({
             success: true,
-            message: "Pago registrado correctamente"
+            message: "Pago de membresía registrado correctamente"
         });
     } catch (err) {
-        console.error("Error executing registrar_pago_membresia procedure: ", err);
+        console.error("Error ejecutando registrar_pago_membresia procedure: ", err);
         res.status(400).json({
             success: false,
             message: "Error al registrar el pago. Verifique los datos ingresados."
         });
     }
-}
+};
 
+export const obtenerMembresiasVencidas = async (req, res) => {
+    const { connection } = getConnection();
 
+    if (!connection) {
+        return res.status(400).json({
+            success: false,
+            message: "No active Sql server connection",
+        });
+    }
+
+    try {
+        const result = await connection
+            .request()
+            .query(`
+                SELECT 
+                    cm.cedula,
+                    p.nombre,
+                    p.apellido1,
+                    m.fecha_expiracion,
+                    DATEDIFF(DAY, m.fecha_expiracion, GETDATE()) AS dias_vencida
+                FROM cliente_membresias cm
+                JOIN persona p ON cm.cedula = p.cedula
+                JOIN membresia m ON cm.id_membresia = m.id_membresia
+                WHERE cm.vigente = 1 
+                  AND m.fecha_expiracion < GETDATE()
+            `);
+
+        res.json({
+            success: true,
+            data: result.recordset
+        });
+    } catch (err) {
+        console.error("Error al obtener membresías vencidas: ", err);
+        res.status(400).json({
+            success: false,
+            message: "Error al obtener membresías vencidas"
+        });
+    }
+};
 
 export const actualizarMembresia = async (req, res) => {
     const { connection } = getConnection();
@@ -151,39 +124,24 @@ export const actualizarMembresia = async (req, res) => {
         });
     }
 
-    const { cedula_cliente, tipo_membresia, monto, fecha_pago, id_forma_pago } = req.body;
-
-    if (!cedula_cliente || !tipo_membresia || !monto || !fecha_pago || !id_forma_pago) {
+    // VALIDACIÓN ZOD
+    const validation = registrarPagoSchema.safeParse(req.body);
+    if (!validation.success) {
         return res.status(400).json({
             success: false,
-            message: "Todos los campos son obligatorios"
+            message: "Datos de membresía inválidos",
+            errors: validation.error.errors
         });
     }
 
-    // CORRECCIÓN: Validar monto en el servidor
-    const montoValidation = validarMonto(monto);
-    if (!montoValidation.valid) {
-        return res.status(400).json({
-            success: false,
-            message: montoValidation.message
-        });
-    }
-
-    // CORRECCIÓN: Validar fecha de pago en el servidor
-    const fechaValidation = validarFechaPago(fecha_pago);
-    if (!fechaValidation.valid) {
-        return res.status(400).json({
-            success: false,
-            message: fechaValidation.message
-        });
-    }
+    const { cedula_cliente, tipo_membresia, monto, fecha_pago, id_forma_pago } = validation.data;
 
     try {
-        // CORRECCIÓN: Verificar que el tipo de membresía existe antes de procesar
+        // CORRECCIÓN: Verificar que el tipo de membresía existe y validar monto
         const tipoCheck = await connection
             .request()
-            .input("tipo", sql.TinyInt, Number(tipo_membresia))
-            .query("SELECT id_tipo_membresia FROM tipo_membresia WHERE id_tipo_membresia = @tipo");
+            .input("tipo", sql.TinyInt, tipo_membresia)
+            .query("SELECT id_tipo_membresia, precio_base FROM tipo_membresia WHERE id_tipo_membresia = @tipo");
 
         if (tipoCheck.recordset.length === 0) {
             return res.status(400).json({
@@ -192,11 +150,20 @@ export const actualizarMembresia = async (req, res) => {
             });
         }
 
+        const precioReal = tipoCheck.recordset[0].precio_base;
+
+        if (Number(monto) !== Number(precioReal)) {
+            return res.status(400).json({
+                success: false,
+                message: "El monto no coincide con el precio oficial."
+            });
+        }
+
         await connection
             .request()
             .input("cedula_cliente", sql.Char(9), cedula_cliente)
             .input("tipo_membresia", sql.TinyInt, tipo_membresia)
-            .input("monto", sql.Decimal(10, 2), montoValidation.value)
+            .input("monto", sql.Decimal(10, 2), precioReal)
             .input("fecha_pago", sql.Date, fecha_pago)
             .input("id_forma_pago", sql.Int, id_forma_pago)
             .execute("actualizar_membresia_cliente");
@@ -214,110 +181,44 @@ export const actualizarMembresia = async (req, res) => {
     }
 };
 
-
-
-export const renovar_membresia = async (req, res) => {
-    const {connection} = getConnection();
-
-    if (!connection) {
-        return res.status(400).json({
-            success: false,
-            message: "No active SQL Server connection",
-        });
-    }
-
-    const {cedula,monto,id_forma_pago} = req.body;
-
-    if (!cedula || !monto || !id_forma_pago) {
-        return res.status(400).json({
-            success: false,
-            message: "Todos los campos son obligatorios"
-        });
-    }
-
-    // CORRECCIÓN: Validar monto en el servidor
-    const montoValidation = validarMonto(monto);
-    if (!montoValidation.valid) {
-        return res.status(400).json({
-            success: false,
-            message: montoValidation.message
-        });
-    }
-
-    try {
-        // CORRECCIÓN: Verificar que el cliente tiene una membresía activa antes de renovar
-        const membresiaCheck = await connection
-            .request()
-            .input("cedula", sql.Char(9), cedula)
-            .query(`
-                SELECT cm.id_membresia, m.tipo, m.fecha_expiracion
-                FROM cliente_membresias cm
-                JOIN membresia m ON cm.id_membresia = m.id_membresia
-                WHERE cm.cedula = @cedula AND cm.vigente = 1
-            `);
-
-        if (membresiaCheck.recordset.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "El cliente no tiene una membresía activa para renovar."
-            });
-        }
-
-        await connection
-            .request()
-            .input("cedula", sql.Char(9), cedula)
-            .input("monto", sql.Decimal(10, 2), montoValidation.value)
-            .input("id_forma_pago", sql.Int, id_forma_pago)
-            .execute("renovar_membresia");
-
-        res.status(200).json({
-            success: true,
-            message: "Membresía renovada correctamente"
-        });
-    } catch (err) {
-        console.error("Error executing renovar_membresia procedure: ", err);
-        res.status(400).json({
-            success: false,
-            message: "Error al renovar la membresía. Verifique los datos ingresados."
-        });
-    }
-}
-
-
-export const clientesMembresiaVencida = async (req, res) => {
+export const obtenerMembresiaActiva = async (req, res) => {
     const { connection } = getConnection();
 
     if (!connection) {
         return res.status(400).json({
             success: false,
-            message: "No active Sql server connection"
+            message: "No active Sql server connection",
         });
     }
+
+    const { cedula } = req.params;
 
     try {
         const result = await connection
             .request()
+            .input("cedula", sql.Char(9), cedula)
             .query(`
-                    SELECT 
-                        p.cedula,
-                        p.nombre + ' ' + p.apellido1 + ' ' + p.apellido2 AS nombre_completo,
-                        m.fecha_expiracion,
-                        DATEDIFF(DAY, m.fecha_expiracion, GETDATE()) AS dias_vencida
-                    FROM cliente_membresias cm
-                    JOIN membresia m ON cm.id_membresia = m.id_membresia
-                    JOIN persona p ON cm.cedula = p.cedula
-                    WHERE m.fecha_expiracion < GETDATE();
-                `);
-        console.log(result);
+                SELECT 
+                    cm.id_membresia,
+                    tm.nombre AS tipo,
+                    m.fecha_inicio,
+                    m.fecha_expiracion,
+                    cm.vigente
+                FROM cliente_membresias cm
+                JOIN membresia m ON cm.id_membresia = m.id_membresia
+                JOIN tipo_membresia tm ON m.id_tipo_membresia = tm.id_tipo_membresia
+                WHERE cm.cedula = @cedula AND cm.vigente = 1
+            `);
+
         res.json({
             success: true,
-            tables: [result.recordset]
+            data: result.recordset[0] || null
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        console.error("Error al obtener membresía activa: ", err);
         res.status(400).json({
             success: false,
-            message: "Error al consultar membresías vencidas."
+            message: "Error al obtener membresía activa"
         });
     }
-}
+};
