@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 
 const api = "http://localhost:3100"
 
@@ -43,7 +44,12 @@ export default function AuthPage() {
           router.push("/dashboard");
         }, 1000);
       } else {
-        setMessage(`Error: ${data.message}`);
+        // CORRECCIÓN B-02 (CWE-79): Prevención de XSS (Sanitización en el cliente)
+        // Sanitizar cualquier dato recibido del servidor antes de renderizarlo,
+        // especialmente si el backend es vulnerable o expone mensajes directos de la BD.
+        const dirtyMessage = `Error: ${data.message}`;
+        const cleanMessage = DOMPurify.sanitize(dirtyMessage);
+        setMessage(cleanMessage);
       }
     } catch (error) {
       console.error("Error connecting:", error);
@@ -102,7 +108,13 @@ export default function AuthPage() {
             </button>
           </form>
           {message && (
-            <p className="text-center text-sm mt-2 text-gray-700">{message}</p>
+            // Uso de dangerouslySetInnerHTML para demostrar que el mensaje podría
+            // contener HTML (y por lo tanto scripts maliciosos si no estuviera sanitizado).
+            // Gracias a DOMPurify en el setMessage, esto ahora es seguro.
+            <div 
+              className="text-center text-sm mt-2 text-red-600 bg-red-100 p-2 rounded"
+              dangerouslySetInnerHTML={{ __html: message }}
+            />
           )}
         </div>
 
