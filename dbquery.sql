@@ -212,6 +212,7 @@ CREATE TABLE membresia(
 CREATE TABLE tipo_membresia(
 	id_tipo_membresia		TINYINT				NOT NULL,
 	tipo					VARCHAR(30)			NOT NULL,
+	precio_base				DECIMAL(10, 2)		NOT NULL,
 
 	CONSTRAINT PK_id_tipo_tipo_membresia PRIMARY KEY(id_tipo_membresia)
 )
@@ -793,9 +794,9 @@ INSERT INTO cliente (cedula, estado, fecha_registro) VALUES
 
 
 -- Tabla tipo_membresia
-INSERT INTO tipo_membresia (id_tipo_membresia, tipo) VALUES
-(1,'Mensual'),(2,'Trimestral'),(3,'Anual'),
-(4,'Semestral'),(5,'Diaria')
+INSERT INTO tipo_membresia (id_tipo_membresia, tipo, precio_base) VALUES
+(1,'Mensual', 20000.00),(2,'Trimestral', 50000.00),(3,'Anual', 180000.00),
+(4,'Semestral', 90000.00),(5,'Diaria', 2500.00)
 
 -- Tabla membresia
 INSERT INTO membresia (tipo) VALUES
