@@ -1,5 +1,6 @@
 import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
+import { inscripcionSesionSchema } from "../schemas/sesion.schema.js";
 
 export const crearSesion = async (req, res) => {
     const { connection } = getConnection();
@@ -90,20 +91,20 @@ export const inscribirClienteASesion = async (req, res) => {
         });
     }
 
-    const { cedula_cliente, id_sesion_programada } = req.body;
-
-    if (!cedula_cliente || !id_sesion_programada) {
+    // VALIDACIÓN ZOD: No confiar en la estructura del body del cliente
+    const validation = inscripcionSesionSchema.safeParse(req.body);
+    if (!validation.success) {
         return res.status(400).json({
             success: false,
-            message: "Todos los campos son obligatorios"
+            message: "Datos de entrada inválidos",
+            errors: validation.error.errors
         });
     }
 
+    const { cedula_cliente, id_sesion_programada } = validation.data;
+
     try {
         // CORRECCIÓN A-06 (CAPEC-178): Verificar membresía activa en el SERVIDOR
-        // antes de inscribir al cliente. No confiar en que el frontend haya validado esto.
-        // Un atacante podría enviar la petición directamente con curl/Postman
-        // sin pasar por la validación del frontend.
         const membresiaCheck = await connection
             .request()
             .input("cedula_check", sql.Char(9), cedula_cliente)
