@@ -35,6 +35,9 @@ export default function AuthPage() {
       console.log("Response data:", data);
 
       if (data.success) {
+        // Guardamos el rol para las peticiones al backend
+        localStorage.setItem("userRole", "admin"); 
+        
         setMessage("Conexión exitosa. Redirigiendo...");
         setTimeout(() => {
           router.push("/dashboard");
