@@ -15,7 +15,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.2.1",
-    "mssql": "^11.0.1"
+    "mssql": "^11.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "jest": "^30.4.1",
