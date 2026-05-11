@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import AdminMaquina from "@/types/adminMaquina"
 import RevisionHistoryModal from "@/components/RevisionHistoryModal"
+import { adminMaquinaSchema } from "@/lib/security-schemas"
+import { z } from "zod"
 
 const api = "http://localhost:3100"
 
@@ -30,7 +32,15 @@ export default function AdminMaquinasPage() {
         const data = await res.json()
 
         if (data.success && Array.isArray(data.data)) {
-          setMaquinas(data.data)
+          // CORRECCIÓN: Validación de integridad y saneamiento de datos masivos
+          const validatedData = z.array(adminMaquinaSchema).safeParse(data.data)
+          
+          if (validatedData.success) {
+            setMaquinas(validatedData.data as AdminMaquina[])
+          } else {
+            console.error("Fallo de integridad en lista de máquinas:", validatedData.error)
+            // Podríamos mostrar un error amigable aquí
+          }
         } else {
           throw new Error("Formato de datos inválido")
         }

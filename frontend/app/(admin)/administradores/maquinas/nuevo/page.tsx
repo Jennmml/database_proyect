@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, CheckCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { maquinaFormSchema, apiResponseSchema } from "@/lib/security-schemas"
 
 interface EstadoMaquina {
     id_estado: number;
@@ -30,8 +31,16 @@ export default function NuevaMaquinaPage() {
     const fetchEstados = async () => {
       try {
         const response = await fetch(`${api}/consultas/estadosMaquina`)
-        const data = await response.json()
-        setEstados(data.data)
+        const rawData = await response.json()
+        
+        // CORRECCIÓN: Validación de integridad de datos recibidos del API
+        const validation = apiResponseSchema.safeParse(rawData)
+        if (validation.success && validation.data.data) {
+            setEstados(validation.data.data)
+        } else {
+            console.error("Respuesta del API malformada detectada por Zod")
+            setError("Error de integridad de datos del servidor.")
+        }
       } catch (err) {
         console.error("Error cargando estados:", err)
       }
@@ -45,11 +54,16 @@ export default function NuevaMaquinaPage() {
     setError(null)
     setSuccess(null)
 
-    if (!tipo || !modelo || !marca) {
-      setError("Todos los campos son obligatorios.")
+    // CORRECCIÓN: Validación y Saneamiento antes del envío
+    const validation = maquinaFormSchema.safeParse({ tipo, modelo, marca, estado })
+    
+    if (!validation.success) {
+      const firstError = validation.error.errors[0].message
+      setError(firstError)
       return
     }
 
+    const cleanedData = validation.data
     setLoading(true)
 
     try {
@@ -58,11 +72,11 @@ export default function NuevaMaquinaPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ estado, tipo, modelo, marca })
+        body: JSON.stringify(cleanedData)
       })
 
       if (!res.ok) throw new Error("Error al registrar la máquina.")
-      setSuccess("Máquina registrada correctamente.")
+      setSuccess("Máquina registrada y saneada correctamente.")
       setTipo("")
       setModelo("")
       setMarca("")
