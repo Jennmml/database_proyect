@@ -33,7 +33,6 @@ export default function AuthPage() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (data.success) {
         // Guardamos el rol para las peticiones al backend
