@@ -58,7 +58,7 @@ export default function NuevaMaquinaPage() {
     const validation = maquinaFormSchema.safeParse({ tipo, modelo, marca, estado })
     
     if (!validation.success) {
-      const firstError = validation.error.errors[0].message
+      const firstError = validation.error.issues[0].message
       setError(firstError)
       return
     }
