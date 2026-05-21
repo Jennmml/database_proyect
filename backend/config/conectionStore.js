@@ -1,3 +1,5 @@
+import logger from '../utils/logger.js';
+
 let currentConnection = null; 
 
 export const setConnection = (connection) => {
@@ -11,22 +13,22 @@ export const getConnection = () => {
 export const clearConnection = async () => {
   try {
     if (!currentConnection) {
-      console.log('No connection to close.');
+      logger.info('No connection to close.');
       return; 
     }
 
     if (!currentConnection.connected || !currentConnection.ready) {
-      console.log('Connection was not active or already closed');
+      logger.info('Connection was not active or already closed');
       currentConnection = null; 
       return; 
     }
 
-    console.log('Closing active SQL Server connection');
+    logger.info('Closing active SQL Server connection');
     await currentConnection.close();
-    console.log('Connection closed successfully.');
+    logger.info('Connection closed successfully.');
     currentConnection = null;
   } catch (err) {
-    console.error('Error closing the connection:', err);
+    logger.error('Error closing the connection', { error: err.message });
     throw err;
   }
 };
