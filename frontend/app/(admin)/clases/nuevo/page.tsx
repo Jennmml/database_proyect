@@ -62,7 +62,7 @@ export default function NuevaClasePage() {
           hora_fin: ""
         })
       } else {
-        setMensaje(`❌ Error: ${data.message || "No se pudo crear la clase."}`)
+        setMensaje("❌ No se pudo crear la clase. Intentá de nuevo.")
       }
     } catch (error) {
       setMensaje("❌ Error inesperado al conectar con el servidor.")
