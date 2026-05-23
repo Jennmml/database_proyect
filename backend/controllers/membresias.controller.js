@@ -222,3 +222,31 @@ export const obtenerMembresiaActiva = async (req, res) => {
         });
     }
 };
+
+export const renovar_membresia = async (req, res) => {
+    const { connection } = getConnection();
+
+    if (!connection) {
+        return res.status(400).json({ success: false, message: "No active SQL Server connection" });
+    }
+
+    const { cedula, monto, id_forma_pago } = req.body;
+
+    if (!cedula || !monto || !id_forma_pago) {
+        return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });
+    }
+
+    try {
+        await connection
+            .request()
+            .input("cedula", sql.Char(9), cedula)
+            .input("monto", sql.Decimal(10, 2), monto)
+            .input("id_forma_pago", sql.Int, id_forma_pago)
+            .execute("renovar_membresia");
+
+        res.status(200).json({ success: true, message: "Membresía renovada correctamente" });
+    } catch (err) {
+        console.error("Error executing renovar_membresia: ", err);
+        res.status(400).json({ success: false, message: "Error al renovar la membresía" });
+    }
+};
