@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import { authenticateToken } from "../middleware/auth.middleware.js";
 
 import {
     getDistritos,
@@ -19,7 +19,7 @@ router.get("/distritos", getDistritos);
 router.get("/clases", getClases);
 router.get("/asistencia", getAsistencia);
 router.get("/tipoMembresia", getTipoMembresia);
-router.get("/cliente/:cedula", getCliente);
+router.get("/cliente/:cedula", authenticateToken, getCliente);
 router.get("/entrenadores", getEntrenadores);
 router.get("/estadosMaquina", getEstadosMaquina);
 router.get("/maquinas", getMaquinas);

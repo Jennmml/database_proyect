@@ -122,6 +122,25 @@ export const getCliente = async (req, res) => {
         });
     }
 
+    // CORRECCIÓN 2: Validación de autorización - IDOR prevention
+    // Verificar que el usuario sea admin o el propietario de la cédula
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "No autenticado. Se requiere un token válido."
+        });
+    }
+
+    const esAdmin = req.user.role === 'admin';
+    const esPropietario = req.user.cedula === cedula;
+
+    if (!esAdmin && !esPropietario) {
+        return res.status(403).json({
+            success: false,
+            message: "No autorizado para acceder a este recurso. Solo puedes consultar tu propia cédula o eres administrador."
+        });
+    }
+
     try {
         const result = await connection
             .request()
