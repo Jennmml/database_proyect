@@ -1,5 +1,5 @@
 import Router from 'express';
-import { requireRole } from "../middleware/auth.middleware.js";
+import { requireRole, authenticateToken } from "../middleware/auth.middleware.js";
 
 import {
     agregarMaquina,
@@ -9,8 +9,8 @@ import {
 
 const router = Router();
 
-router.post("/agregarMaquina", requireRole('admin'), agregarMaquina);
-router.post('/nuevaRevisionMaquina', requireRole('admin'), nuevaRevisionMaquina);
+router.post("/agregarMaquina", authenticateToken, requireRole('admin'), agregarMaquina);
+router.post('/nuevaRevisionMaquina', authenticateToken, requireRole('admin'), nuevaRevisionMaquina);
 router.get('/cursorMaquinasVencidas', cursorMaquinaVencidas);
 
 export default router;
