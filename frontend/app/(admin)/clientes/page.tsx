@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Cliente } from "@/types/cliente"
+import { ClientesResponseSchema } from "./schema"
 
 const api = "http://localhost:3100"
 
@@ -41,6 +42,7 @@ export default function ClientesPage() {
   const [nuevoTelefono, setNuevoTelefono] = useState("")
   const [errorForm, setErrorForm] = useState("")
   const [mensajeExito, setMensajeExito] = useState("")
+  const [errorData, setErrorData] = useState("")
   
 
   useEffect(() => {
@@ -52,7 +54,15 @@ export default function ClientesPage() {
       const response = await fetch(`${api}/clientes/vistaClientes`)
       const data = await response.json()
       if (data.success && Array.isArray(data.tables) && Array.isArray(data.tables[0])) {
-        setClientes(data.tables[0])
+        const result = ClientesResponseSchema.safeParse(data.tables[0])
+        
+        if (!result.success) {
+          setErrorData("Respuesta inválida del servidor")
+          return
+        }
+
+        setErrorData("")
+        setClientes(result.data as Cliente[])
       } else {
         console.warn("Formato de respuesta inesperado:", data)
       }
@@ -170,6 +180,11 @@ export default function ClientesPage() {
           <CardDescription>Todos los clientes registrados en el sistema</CardDescription>
         </CardHeader>
         <CardContent>
+          {errorData && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+              <p className="text-red-700">{errorData}</p>
+            </div>
+          )}
           <div className="flex items-center space-x-2 mb-4">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
