@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Plus, Search, Trash2 } from "lucide-react"
+import { escapeText } from "../../../utils/escapeText"
 
 interface Clase {
   id_clase: number
@@ -140,8 +141,8 @@ export default function ClasesPage() {
               {clasesFiltradas.map((clase) => (
                 <TableRow key={clase.id_clase} className="h-10">
                   <TableCell className="py-1">{clase.id_clase}</TableCell>
-                  <TableCell className="py-1">{clase.nombre}</TableCell>
-                  <TableCell className="py-1 text-muted-foreground">{clase.descripcion}</TableCell>
+                  <TableCell className="py-1">{escapeText(clase.nombre)}</TableCell>
+                  <TableCell className="py-1 text-muted-foreground">{escapeText(clase.descripcion)}</TableCell>
                   <TableCell className="py-1">{clase.total_sesiones}</TableCell>
                   <TableCell className="py-1 text-right">
                     <Button
