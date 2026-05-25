@@ -63,7 +63,7 @@ Los tests están escritos para fallar con el código original y pasar con el có
 cd backend && npm test
 
 # Tests de frontend (Vitest)
-cd frontend && npm test
+cd frontend && npx vitest run
 ```
 
 ---
