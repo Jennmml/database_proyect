@@ -59,7 +59,7 @@ git checkout master
 Los tests están escritos para fallar con el código original y pasar con el código corregido. No necesitás tener la base de datos levantada para correrlos porque usan mocks.
 
 ```bash
-# Tests de backend (Jest + Supertest)
+# Tests de backend (Vitest)
 cd backend && npm test
 
 # Tests de frontend (Vitest)
@@ -91,7 +91,7 @@ curl http://localhost:3100/helper/cliente/AAAAAAAAA
 # versión corregida: HTTP 400
 ```
 
-Tests en `backend/__tests__/jennifer-p2-cedula.test.js`.
+Tests en `tests/backend/jennifer-p2.test.js`.
 
 ---
 
@@ -101,14 +101,14 @@ El servidor no tenía ningún control de autenticación. Cualquier persona podí
 
 Para reproducir con la app en versión original:
 ```bash
-# versión vulnerable: devuelve 200 sin ningún header
+# versión vulnerable: devuelve 200 sin autenticación
 curl -X DELETE http://localhost:3100/clientes/eliminarPersona
 
-# versión corregida: 401 sin header, 403 con rol incorrecto, 200 con admin
-curl -X DELETE http://localhost:3100/clientes/eliminarPersona -H "x-user-role: admin"
+# versión corregida: 401 sin token
+curl -X DELETE http://localhost:3100/clientes/eliminarPersona
 ```
 
-Tests en `backend/__tests__/jennifer-p2-auth.test.js`.
+Tests en `tests/backend/jennifer-p2.test.js`.
 
 ---
 
