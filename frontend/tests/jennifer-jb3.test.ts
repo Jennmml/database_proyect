@@ -15,10 +15,10 @@ import path from "path"
 const NEXT_CONFIG_PATH = path.resolve(__dirname, "../next.config.ts")
 
 describe("J-B3 (CWE-1021): Headers de seguridad HTTP", () => {
-  it("ANTES: next.config.ts no tenía headers de seguridad definidos", () => {
+  it("DESPUÉS: next.config.ts define la función headers() de seguridad", () => {
     const content = fs.readFileSync(NEXT_CONFIG_PATH, "utf-8")
-    // El archivo vacío original no tenía función headers()
-    // Verificamos que ahora SÍ existe (es decir, la vulnerabilidad fue corregida)
+    // La versión vulnerable no tenía función headers() — este test falla en esa versión
+    // La versión corregida la incluye — este test pasa
     expect(content).toContain("async headers()")
   })
 
