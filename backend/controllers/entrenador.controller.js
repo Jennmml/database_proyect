@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
 
@@ -49,7 +50,7 @@ export const asignarEntrenadorASesionProgramada = async (req, res) => {
             "message": "Trainer assigned to scheduled session successfully.",
         });
     } catch (error) {
-        console.error("There is already a trainer assigned to this session:", error);
+        logger.error("There is already a trainer assigned to this session:", error);
         return res.status(500).json({
             success: false,
             message: "There is already a trainer assigned to this session.",
@@ -77,7 +78,7 @@ export const vistaClienteSesionEntrenador = async (req, res) => {
             data: result.recordset,
         });
     } catch (error) {
-        console.error("Error getting trainer sessions:", error);
+        logger.error("Error getting trainer sessions:", error);
         return res.status(500).json({
             success: false,
             message: "Error getting trainer sessions.",
@@ -105,7 +106,7 @@ export const vistaSesionesSinEntrenador = async (req, res) => {
             data: result.recordset,
         });
     } catch (error) {
-        console.error("Error getting sessions without trainer:", error);
+        logger.error("Error getting sessions without trainer:", error);
         return res.status(500).json({
             success: false,
             message: "Error getting sessions without trainer.",
@@ -133,7 +134,7 @@ export const vistaEntrenadorSesionesTotales = async(req,res)=>{
             data: result.recordset,
         });
     } catch (error) {
-        console.error("Error getting total trainer sessions:", error);
+        logger.error("Error getting total trainer sessions:", error);
         return res.status(500).json({
             success: false,
             message: "Error getting total trainer sessions.",

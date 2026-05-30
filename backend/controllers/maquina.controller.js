@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from 'mssql';
 import { getConnection } from "../config/conectionStore.js";
 
@@ -27,7 +28,7 @@ export const agregarMaquina = async (req, res) => {
             message: "Máquina agregada correctamente.",
         });
     } catch (error) {
-        console.error("Error al agregar la máquina:", error);
+        logger.error("Error al agregar la máquina:", error);
         return res.status(500).json({
             success: false,
             message: "Error al agregar la máquina.",
@@ -102,7 +103,7 @@ export const nuevaRevisionMaquina = async (req, res) => {
             message: "Revision created successfully.",
         });
     } catch (error) {
-        console.error("Error creating revision:", error);
+        logger.error("Error creating revision:", error);
         return res.status(500).json({
             success: false,
             message: "Error creating revision.",
@@ -130,7 +131,7 @@ export const cursorMaquinaVencidas = async (req, res) => {
             data: result.recordset,
         });
     } catch (error) {
-        console.error("Error al obtener las máquinas vencidas:", error);
+        logger.error("Error al obtener las máquinas vencidas:", error);
         return res.status(500).json({
             success: false,
             message: "Error al obtener las máquinas vencidas.",

@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
 
@@ -19,7 +20,7 @@ export const getDistritos = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_distritos procedure: ", err);
+        logger.error("Error executing get_distritos procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -45,7 +46,7 @@ export const getClases = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_clases procedure: ", err);
+        logger.error("Error executing get_clases procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -70,7 +71,7 @@ export const getAsistencia = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_asistencia procedure: ", err);
+        logger.error("Error executing get_asistencia procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -95,7 +96,7 @@ export const getTipoMembresia = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_tipo_membresia procedure: ", err);
+        logger.error("Error executing get_tipo_membresia procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -160,7 +161,7 @@ export const getCliente = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Error executing get_persona query: ", err);
+        logger.error("Error executing get_persona query: ", err);
         res.status(500).json({
             success: false,
             message: err.message
@@ -196,7 +197,7 @@ export const getEntrenadores = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_entrenadores procedure: ", err);
+        logger.error("Error executing get_entrenadores procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -221,7 +222,7 @@ export const getEstadosMaquina = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_estados_maquina query: ", err);
+        logger.error("Error executing get_estados_maquina query: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -246,7 +247,7 @@ export const getMaquinas = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing get_maquinas query: ", err);
+        logger.error("Error executing get_maquinas query: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -302,7 +303,7 @@ export const getAdmin = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Error executing get_persona query: ", err);
+        logger.error("Error executing get_persona query: ", err);
         res.status(500).json({
             success: false,
             message: err.message
