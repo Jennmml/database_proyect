@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
 import { inscripcionSesionSchema } from "../schemas/sesion.schema.js";
@@ -33,7 +34,7 @@ export const crearSesion = async (req, res) => {
             message: "Sesión creada exitosamente",
         });
     } catch (err) {
-        console.error("Error al crear la sesión: ", err);
+        logger.error("Error al crear la sesión: ", err);
         res.status(400).json({
             success: false,
             message: err.message,
@@ -72,7 +73,7 @@ export const eliminarSesion = async (req, res) => {
             message: "Sesión eliminada correctamente"
         });
     } catch (err) {
-        console.error("Error executing eliminar_sesion_programada procedure: ", err);
+        logger.error("Error executing eliminar_sesion_programada procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -135,7 +136,7 @@ export const inscribirClienteASesion = async (req, res) => {
             message: "Cliente inscrito a la sesión correctamente"
         });
     } catch (err) {
-        console.error("Error executing inscribir_cliente_a_sesion_programada procedure: ", err);
+        logger.error("Error executing inscribir_cliente_a_sesion_programada procedure: ", err);
         res.status(400).json({
             success: false,
             message: "Error al inscribir al cliente. Verifique los datos ingresados."
@@ -175,7 +176,7 @@ export const desinscribirClienteDeSesion = async (req, res) => {
             message: "Cliente desinscrito de la sesión correctamente"
         });
     } catch (err) {
-        console.error("Error executing desinscribir_cliente_de_sesion_programada procedure: ", err);
+        logger.error("Error executing desinscribir_cliente_de_sesion_programada procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -211,13 +212,13 @@ export const vistaSesiones = async (req, res) => {
                 JOIN grupo g ON s.numero_grupo = g.numero_grupo
                 JOIN horario h ON s.id_horario = h.id_horario;
                 `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -240,13 +241,13 @@ export const vistaDetallesSesion = async (req, res) => {
         const result = await connection
             .request()
             .query(`SELECT * FROM vista_detalles_sesion_programadas ;`);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -280,13 +281,13 @@ export const cantidadSesionPorMes = async (req, res) => {
                     GROUP BY c.nombre, DATENAME(MONTH, sp.fecha), YEAR(sp.fecha)
                     ORDER BY mes DESC
                 `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -321,13 +322,13 @@ export const distribucionGeneroPorEstado = async (req, res) => {
                     JOIN estados_clientes ec ON c.estado = ec.id_estado
                     GROUP BY ec.estado;
                 `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -361,13 +362,13 @@ export const promedioPorGrupoYCupos = async (req, res) => {
                 FROM grupo;
 
                 `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -390,13 +391,13 @@ export const cursorSesionesSinEntrenador = async (req, res) => {
         const result = await connection
             .request()
             .execute("cursor_sesiones_sin_entrenador");
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             data : result.recordset
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -434,7 +435,7 @@ export const obtenerInscritosPorSesion = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing obtener_inscritos_por_sesion procedure: ", err);
+        logger.error("Error executing obtener_inscritos_por_sesion procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
