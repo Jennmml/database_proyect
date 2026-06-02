@@ -149,7 +149,7 @@ Tests en `frontend/tests/jennifer-jb3.test.ts`.
 
 ### Kimberly Salazar Acuña
 
-**Ramas:** `fix/ss-parameter-injection`, `fix/ss-trust-exploitation-kim`, `fix/A-08-A-09-logging-estructurado`, `fix/cs-security-kim`
+**Ramas:** `fix/ss-parameter-injection`, `fix/A-06-explotacion-confianza-pagos`, `fix/A-08-A-09-logging-estructurado`, `fix/cliente-auth-guard-y-sanitizacion-xss`
 
 **PRs:** #3, #4, #16, #8
 
