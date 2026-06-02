@@ -41,10 +41,11 @@ Para demostrar la efectividad de la corrección, se pueden seguir estos pasos:
 ### 1. Estado Vulnerable (Fallo de Tests)
 Ejecute el siguiente comando para revertir temporalmente los controladores al estado previo a la corrección:
 ```bash
-git checkout HEAD^ -- controllers/membresias.controller.js controllers/sesion.controller.js
+git checkout 940f5a6 -- backend/controllers/membresias.controller.js backend/controllers/sesion.controller.js
 ```
 Luego, ejecute los tests:
 ```bash
+cd backend
 pnpm test -- trust-exploitation.test.js
 ```
 **Observación:** Los tests fallarán (Rojo). Explique que el sistema permite montos alterados y no valida la vigencia de la membresía en el servidor.
@@ -52,10 +53,12 @@ pnpm test -- trust-exploitation.test.js
 ### 2. Estado Corregido (Paso de Tests)
 Restaure las correcciones de seguridad:
 ```bash
-git checkout HEAD -- controllers/membresias.controller.js controllers/sesion.controller.js
+cd ..
+git checkout HEAD -- backend/controllers/membresias.controller.js backend/controllers/sesion.controller.js
 ```
 Ejecute los tests nuevamente:
 ```bash
+cd backend
 pnpm test -- trust-exploitation.test.js
 ```
 **Observación:** Los tests pasarán (Verde). Explique que ahora el servidor utiliza **Zod** para validar la estructura y consulta la **Base de Datos** para validar precios y estados, eliminando la confianza en el cliente.
