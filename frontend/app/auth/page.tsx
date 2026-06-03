@@ -158,7 +158,7 @@ export default function AuthPage() {
                 </p>
 
                 <p>
-                    Nota: Si se usa docker el host debe de ser: <strong>host.docker.internal</strong>
+                Nota: Si se usa docker el host debe de ser: <strong>host.docker.internal</strong>
                 </p>
 
             <p className="mt-2">
@@ -168,7 +168,7 @@ export default function AuthPage() {
                 http://localhost:3000
               </a>
               <br />
-              Y listo, ya con eso se puede usar la aplicación sin problemas.
+              And listo, ya con eso se puede usar la aplicación sin problemas.
             </p>
           </div>
         </div>
