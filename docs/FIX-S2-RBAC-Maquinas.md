@@ -111,7 +111,7 @@ Estos tests **revierten temporalmente el código al estado vulnerable** para dem
 ```bash
 cd backend
 pnpm install
-pnpm test -- maquina.rbac.test.js
+npx vitest run __tests__/maquina.rbac.test.js
 ```
 
 **Salida esperada:**

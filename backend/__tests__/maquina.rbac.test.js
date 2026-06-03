@@ -239,6 +239,10 @@ describe('A-03: Control de Acceso (RBAC) - Rutas de Máquinas', () => {
         afterEach(() => {
             // Restaurar el contenido corregido después de cada test
             fs.writeFileSync(routesPath, originalContent, 'utf-8');
+            const tempRoutesPath = path.resolve(__dirname, '../routes/maquina.routes.vulnerable.js');
+            if (fs.existsSync(tempRoutesPath)) {
+                fs.unlinkSync(tempRoutesPath);
+            }
         });
 
         it('VULNERABLE: Sin middleware requireRole, cualquier usuario puede acceder', async () => {
@@ -248,18 +252,16 @@ describe('A-03: Control de Acceso (RBAC) - Rutas de Máquinas', () => {
                 ''
             );
 
-            // Escribir el archivo vulnerable
-            fs.writeFileSync(routesPath, vulnerableContent, 'utf-8');
+            const tempRoutesPath = path.resolve(__dirname, '../routes/maquina.routes.vulnerable.js');
+            fs.writeFileSync(tempRoutesPath, vulnerableContent, 'utf-8');
 
-            // Importar dinámicamente las rutas para obtener el código fresco
+            // Importar dinámicamente las rutas desde el archivo temporal
             vi.resetModules();
 
-            // Crear una nueva instancia de Express con las rutas vulnerables
             const vulnerableApp = express();
             vulnerableApp.use(express.json());
 
-            // Importar las rutas después de modificar el archivo
-            const { default: vulnerableRoutes } = await import('../routes/maquina.routes.js');
+            const { default: vulnerableRoutes } = await import('../routes/maquina.routes.vulnerable.js');
             vulnerableApp.use('/maquinas', vulnerableRoutes);
 
             // Intentar acceso sin autenticación - DEBE fallar en la versión vulnerable
