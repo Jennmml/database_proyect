@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 
 const api = "http://localhost:3100"
 
@@ -40,7 +41,9 @@ export default function AuthPage() {
           router.push("/dashboard");
         }, 1000);
       } else {
-        setMessage(`Error: ${data.message}`);
+        const dirtyMessage = `Error: ${data.message}`;
+        const cleanMessage = DOMPurify.sanitize(dirtyMessage);
+        setMessage(cleanMessage);
       }
     } catch (error) {
       console.error("Error connecting:", error);

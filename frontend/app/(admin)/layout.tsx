@@ -7,6 +7,8 @@ import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider, useTheme } from "../../context/ThemeContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +35,20 @@ function LayoutBody({ children }: { children: React.ReactNode }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole");
+    if (!userRole) {
+      router.push("/auth");
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
+  if (!isAuthorized) return null;
+
   return (
     <ThemeProvider>
       <LayoutBody>{children}</LayoutBody>
