@@ -224,6 +224,7 @@ Para reproducir con la app en versión original:
 # versión vulnerable: el evento se dispara al renderizar el mensaje de error
 # versión corregida: el payload aparece como texto inerte
 ```
+Nota importante: Durante el desarrollo de la actividad, algunas correcciones fueron realizadas accidentalmente desde la cuenta de GitHub de Josué, ya que no se verificó la cuenta activa antes de efectuar los cambios. Estas modificaciones forman parte del trabajo realizado por Kimberly Salazar para este proyecto.
 
 ---
 
