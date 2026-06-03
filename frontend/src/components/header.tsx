@@ -16,6 +16,7 @@ export function Header() {
     });
 
     if (response.ok) {
+      localStorage.removeItem("userRole");
       localStorage.removeItem("toastMaquinasMostrado");
       localStorage.removeItem("toastSesionesMostrado");
       router.push("/");

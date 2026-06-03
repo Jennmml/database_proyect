@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from 'mssql';
 import { getConnection } from "../config/conectionStore.js";
 
@@ -63,7 +64,7 @@ export const crearClase = async (req, res) => {
         message: "Clase creada correctamente.",
         });
     } catch (error) {
-        console.error("Error al ejecutar el procedimiento crear_clase:", error);
+        logger.error("Error al ejecutar el procedimiento crear_clase:", error);
         return res.status(500).json({
         success: false,
         message: "Error interno al crear la clase.",
@@ -103,7 +104,7 @@ export const eliminarClase = async (req, res) => {
             message: "Clase eliminada correctamente"
         });
     } catch (err) {
-        console.error("Error executing eliminar_clase procedure: ", err);
+        logger.error("Error executing eliminar_clase procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -144,7 +145,7 @@ export const registarAsistencia = async (req, res) => {
             message: "Asistencia registrada correctamente"
         });
     } catch (err) {
-        console.error("Error executing registrar_asistencia_cliente procedure: ", err);
+        logger.error("Error executing registrar_asistencia_cliente procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -173,7 +174,7 @@ export const vistaTotalClasesPorSesion = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing vista_total_clases_por_sesion procedure: ", err);
+        logger.error("Error executing vista_total_clases_por_sesion procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message

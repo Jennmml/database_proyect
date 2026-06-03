@@ -58,7 +58,7 @@ export default function NuevaMaquinaPage() {
     const validation = maquinaFormSchema.safeParse({ tipo, modelo, marca, estado })
     
     if (!validation.success) {
-      const firstError = validation.error.errors[0].message
+      const firstError = validation.error.issues[0].message
       setError(firstError)
       return
     }
@@ -67,10 +67,13 @@ export default function NuevaMaquinaPage() {
     setLoading(true)
 
     try {
+      const role = localStorage.getItem("userRole") || "guest";
+
       const res = await fetch(`${api}/maquinas/agregarMaquina`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "x-user-role": role
         },
         body: JSON.stringify(cleanedData)
       })

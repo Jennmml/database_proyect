@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import auditLogger from './middleware/logger.middleware.js';
+import logger from './utils/logger.js';
 
 import helperRoutes from './routes/helper.routes.js'
 import dbRoutes from './routes/db.routes.js'
@@ -17,6 +19,7 @@ const port = 3100;
 
 app.use(cors());
 app.use(express.json());
+app.use(auditLogger);
 
 app.use('/consultas', helperRoutes);
 app.use('/connection', dbRoutes)
@@ -30,5 +33,5 @@ app.use('/maquinas', maquinaRoutes)
 app.use('/entrenadores', entrenadorRoutes);
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    logger.info(`Server is running on http://localhost:${port}`);
 });

@@ -1,4 +1,5 @@
 import connect from '../config/dbconfig.js';
+import logger from '../utils/logger.js';
 import {setConnection, clearConnection}  from '../config/conectionStore.js';
 
 export const conectToSqlServer = async(req,res)=>{
@@ -24,7 +25,7 @@ export const conectToSqlServer = async(req,res)=>{
         setConnection(connection)
 
     }catch(err){
-       console.error('Error connecting to sql server:', err);
+       logger.error('Error connecting to sql server', { error: err.message });
         res.status(500).json({ 
         success: false, 
         message: err.message,
@@ -46,13 +47,13 @@ export const conectToSqlServer = async(req,res)=>{
 export const disconnectFromSqlServer = (req,res)=>{
     try{
         clearConnection()
-        console.log("Connection succesfully closed to sql servere");
+        logger.info("Connection succesfully closed to sql server");
         res.json({
             success:true,
             message:"Connection succesfully closed to sql server"
         })
     }catch(err){
-        console.error("Error connecting to sql server");
+        logger.error("Error connecting to sql server");
         res.status(500).json({
             success:false,
             message:`Error closing the connection: ${err}`

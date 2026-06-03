@@ -1,4 +1,5 @@
 import sql from 'mssql';
+import logger from '../utils/logger.js';
 
 let pool = null;
 
@@ -21,11 +22,11 @@ const connect = async (config) => {
 
     if (pool) {
         try {
-            console.log("Closing existing connection...");
+            logger.info("Closing existing connection...");
             await pool.close();
-            console.log("Existing connection closed.");
+            logger.info("Existing connection closed.");
         } catch (err) {
-            console.error("Error closing existing connection:", err);
+            logger.error("Error closing existing connection", { error: err.message });
         } finally {
             pool = null;
         }
@@ -40,10 +41,10 @@ const connect = async (config) => {
             throw new Error(`Connected to wrong database: expected ${config.database}, got ${currentDb}`);
         }
 
-        console.log(`Connected to SQL Server. Active database: ${currentDb}`);
+        logger.info(`Connected to SQL Server. Active database: ${currentDb}`);
         return pool;
     } catch (err) {
-        console.error("Error connecting to SQL Server:", err);
+        logger.error("Error connecting to SQL Server", { error: err.message });
         throw err;
     }
 };
