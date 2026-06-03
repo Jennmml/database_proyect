@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from "mssql";
 import { getConnection } from "../config/conectionStore.js";
 import { registrarPagoSchema } from "../schemas/membresia.schema.js";
@@ -66,7 +67,7 @@ export const registrarPagoMembresia = async (req, res) => {
             message: "Pago de membresía registrado correctamente"
         });
     } catch (err) {
-        console.error("Error ejecutando registrar_pago_membresia procedure: ", err);
+        logger.error("Error ejecutando registrar_pago_membresia procedure: ", err);
         res.status(400).json({
             success: false,
             message: "Error al registrar el pago. Verifique los datos ingresados."
@@ -106,7 +107,7 @@ export const obtenerMembresiasVencidas = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error al obtener membresías vencidas: ", err);
+        logger.error("Error al obtener membresías vencidas: ", err);
         res.status(400).json({
             success: false,
             message: "Error al obtener membresías vencidas"
@@ -173,7 +174,7 @@ export const actualizarMembresia = async (req, res) => {
             message: "Membresía actualizada correctamente"
         });
     } catch (err) {
-        console.error("Error ejecutando actualizar_membresia_cliente: ", err);
+        logger.error("Error ejecutando actualizar_membresia_cliente: ", err);
         res.status(400).json({
             success: false,
             message: "Error al actualizar la membresía. Verifique los datos ingresados."
@@ -215,10 +216,38 @@ export const obtenerMembresiaActiva = async (req, res) => {
             data: result.recordset[0] || null
         });
     } catch (err) {
-        console.error("Error al obtener membresía activa: ", err);
+        logger.error("Error al obtener membresía activa: ", err);
         res.status(400).json({
             success: false,
             message: "Error al obtener membresía activa"
         });
+    }
+};
+
+export const renovar_membresia = async (req, res) => {
+    const { connection } = getConnection();
+
+    if (!connection) {
+        return res.status(400).json({ success: false, message: "No active SQL Server connection" });
+    }
+
+    const { cedula, monto, id_forma_pago } = req.body;
+
+    if (!cedula || !monto || !id_forma_pago) {
+        return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });
+    }
+
+    try {
+        await connection
+            .request()
+            .input("cedula", sql.Char(9), cedula)
+            .input("monto", sql.Decimal(10, 2), monto)
+            .input("id_forma_pago", sql.Int, id_forma_pago)
+            .execute("renovar_membresia");
+
+        res.status(200).json({ success: true, message: "Membresía renovada correctamente" });
+    } catch (err) {
+        logger.error("Error executing renovar_membresia: ", err);
+        res.status(400).json({ success: false, message: "Error al renovar la membresía" });
     }
 };

@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import sql from 'mssql';
 import { getConnection } from "../config/conectionStore.js";
 
@@ -52,7 +53,7 @@ export const insertarCliente = async (req, res) => {
             message: "Cliente insertado correctamente"
         });
     } catch (err) {
-        console.error("Error executing insertar_cliente procedure: ", err);
+        logger.error("Error executing insertar_cliente procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -97,7 +98,7 @@ export const actualizarPersona = async (req, res) => {
             message: "Cliente actualizado correctamente"
         });
     } catch (err) {
-        console.error("Error executing actualizar_persona procedure: ", err);
+        logger.error("Error executing actualizar_persona procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -136,7 +137,7 @@ export const eliminarPersona = async(req,res)=>{
             message: "Cliente eliminado correctamente"
         });
     } catch (err) {
-        console.error("Error executing eliminar_persona procedure: ", err);
+        logger.error("Error executing eliminar_persona procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -158,13 +159,13 @@ export const vistaClientes = async(req,res) =>{
     try{
         const result =await connection.
         request().query("SELECT * FROM vista_clientes");
-        console.log(result)
+        logger.info(result)
         res.json({
             success:true,
             tables:[result.recordset]
         })
     }catch(err){
-        console.error("Error executing vista_clientes procedure: ", err);
+        logger.error("Error executing vista_clientes procedure: ", err);
         res.status(400).json({
             success:false,
             message: err.message
@@ -186,13 +187,13 @@ export const vistaClientesClase = async(req,res) =>{
     try{
         const result = await connection.
         request().query("SELECT * FROM vista_clientes_clase");
-        console.log(result)
+        logger.info(result)
         res.json({
             success:true,
             tables:[result.recordset]
         })
     }catch(err){
-        console.error("Error executing vista_clientes_clase procedure: ", err);
+        logger.error("Error executing vista_clientes_clase procedure: ", err);
         res.status(400).json({
             success:false,
             message: err.message
@@ -214,13 +215,13 @@ export const vistaClientesSesion = async(req,res) =>{
     try{
         const result = await connection.
         request().query("SELECT * FROM vista_clientes_sesion");
-        console.log(result)
+        logger.info(result)
         res.json({
             success:true,
             tables:[result.recordset]
         })
     }catch(err){
-        console.error("Error executing vista_clientes_sesion procedure: ", err);
+        logger.error("Error executing vista_clientes_sesion procedure: ", err);
         res.status(400).json({
             success:false,
             message: err.message
@@ -250,7 +251,7 @@ export const vistaHistorialPagosClientes = async (req, res) => {
             data: result.recordset
         });
     } catch (err) {
-        console.error("Error executing vista_historial_pagos_clientes view: ", err);
+        logger.error("Error executing vista_historial_pagos_clientes view: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -285,13 +286,13 @@ export const rankingClientes = async (req, res) => {
                 JOIN persona p ON isp.cedula = p.cedula
                 GROUP BY p.cedula, p.nombre, p.apellido1, p.apellido2;
                 `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada1 procedure: ", err);
+        logger.error("Error executing consulta_avanzada1 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
@@ -327,13 +328,13 @@ export const clientesMembresiaProximaAVencer = async (req, res) => {
                     m.fecha_expiracion >= CAST(GETDATE() AS DATE)
                     AND m.fecha_expiracion < DATEADD(DAY, 7, CAST(GETDATE() AS DATE));
             `);
-        console.log(result);
+        logger.info(result);
         res.json({
             success: true,
             tables: [result.recordset]
         });
     } catch (err) {
-        console.error("Error executing consulta_avanzada2 procedure: ", err);
+        logger.error("Error executing consulta_avanzada2 procedure: ", err);
         res.status(400).json({
             success: false,
             message: err.message
